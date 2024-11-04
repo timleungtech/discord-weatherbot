@@ -28,7 +28,7 @@ function setDailyTimer(callback, hour, minute) {
   }, timeUntilTrigger);
 }
 
-function unixToDateTime(unixTimestamp) {
+function unixToDate(unixTimestamp) {
   // Create a Date object from the timestamp in milliseconds
   const date = new Date(unixTimestamp * 1000); 
 
@@ -53,7 +53,7 @@ function unixToDateTime(unixTimestamp) {
   return `${weekdayName} ${month}/${day}`;
 }
 
-function unixToHours(unixTimestamp) {
+function unixToTime(unixTimestamp) {
   // Create a Date object from the timestamp in milliseconds
   const date = new Date(unixTimestamp * 1000); 
 
@@ -89,6 +89,7 @@ async function init() {
 
 async function refresh() {
   try {
+    const data = await getWeather()
     const currentTimeET = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
     console.log(currentTimeET, '- data requested');
 
@@ -98,9 +99,7 @@ async function refresh() {
       return;
     }
 
-    const data = await getWeather()
-
-    let weekly = ''
+    let daily = ''
     let hourly = ''
     for (let i = 0; i < 7; i++){
       let precipType = data.daily.data[i].precipType
@@ -109,7 +108,7 @@ async function refresh() {
         precipType = ''
         precipProbability = ''
       }
-      weekly += `${unixToDateTime(data.daily.data[i].time)} ${Math.round(data.daily.data[i].temperatureHigh)}/${Math.round(data.daily.data[i].temperatureLow)} ${data.daily.data[i].summary} ${precipProbability} ${precipType}\n`
+      daily += `${unixToDate(data.daily.data[i].time)} ${Math.round(data.daily.data[i].temperatureHigh)}/${Math.round(data.daily.data[i].temperatureLow)} ${data.daily.data[i].summary} ${precipProbability} ${precipType}\n`
     }
     for (let i = 0; i < 24; i++){ // 48 max
       let precipType = data.hourly.data[i].precipType
@@ -118,10 +117,10 @@ async function refresh() {
         precipType = ''
         precipProbability = ''
       }
-      hourly += `${unixToHours(data.hourly.data[i].time)} ${Math.round(data.hourly.data[i].temperature)}F ${data.hourly.data[i].summary} ${precipProbability} ${precipType}\n`
+      hourly += `${unixToTime(data.hourly.data[i].time)} ${Math.round(data.hourly.data[i].temperature)}F ${data.hourly.data[i].summary} ${precipProbability} ${precipType}\n`
     }
 
-    const text = weekly + '\n' + hourly
+    const text = daily + '\n' + hourly
     await channel.send(`\`\`\`${text}\`\`\``);
   } catch (error) {
     console.error(`Error occurred during refresh: ${error}`);
