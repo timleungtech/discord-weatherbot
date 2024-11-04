@@ -99,38 +99,29 @@ async function refresh() {
     }
 
     const data = await getWeather()
-    const summary = data.daily.summary
-    const todayData = data.daily.data[0];
-
-    const {
-      time,
-      temperatureHigh,
-      temperatureLow,
-      precipType,
-      precipProbability,
-      dewPoint,
-      humidity,
-      windSpeed
-    } = todayData || {}; // Fallback to an empty object if player is not found
 
     let weekly = ''
     let hourly = ''
     for (let i = 0; i < 7; i++){
-      weekly += `${unixToDateTime(data.daily.data[i].time)} ${Math.round(data.daily.data[i].temperatureHigh)}/${Math.round(data.daily.data[i].temperatureLow)} ${data.daily.data[i].summary} ${Math.round(100*data.daily.data[i].precipProbability)}% ${data.daily.data[i].precipType}\n`
+      let precipType = data.daily.data[i].precipType
+      let precipProbability = `${Math.round(100*data.daily.data[i].precipProbability)}%`
+      if (precipProbability == '0%') {
+        precipType = ''
+        precipProbability = ''
+      }
+      weekly += `${unixToDateTime(data.daily.data[i].time)} ${Math.round(data.daily.data[i].temperatureHigh)}/${Math.round(data.daily.data[i].temperatureLow)} ${data.daily.data[i].summary} ${precipProbability} ${precipType}\n`
     }
     for (let i = 0; i < 24; i++){ // 48 max
       let precipType = data.hourly.data[i].precipType
-      if (precipType == 'none') precipType = ''
-      hourly += `${unixToHours(data.hourly.data[i].time)} ${Math.round(data.hourly.data[i].temperature)}F ${data.hourly.data[i].summary} ${Math.round(100*data.hourly.data[i].precipProbability)}% ${precipType}\n`
+      let precipProbability = `${Math.round(100*data.hourly.data[i].precipProbability)}%`
+      if (precipProbability == '0%') {
+        precipType = ''
+        precipProbability = ''
+      }
+      hourly += `${unixToHours(data.hourly.data[i].time)} ${Math.round(data.hourly.data[i].temperature)}F ${data.hourly.data[i].summary} ${precipProbability} ${precipType}\n`
     }
 
-    const text = `${weekly}
-${hourly}
-Dew Point: ${Math.round(dewPoint)}F
-Humidity: ${humidity*100}%
-Wind Speed: ${windSpeed} mph`
-// High/Low: ${Math.round(temperatureHigh)}/${Math.round(temperatureLow)}
-// Precipitation: ${precipProbability*100}% ${precipType}
+    const text = weekly + '\n' + hourly
     await channel.send(`\`\`\`${text}\`\`\``);
   } catch (error) {
     console.error(`Error occurred during refresh: ${error}`);
@@ -147,11 +138,11 @@ const client = new Discord.Client({ intents: [
 client.on('messageCreate', async (msg) => {
   if (msg.author.bot) return; // Ignore bot messages
 
-  if (msg.content === "$test") {
+  if (msg.content === "$weather") {
     refresh()
   }
 });
 
 // pirateweather api 10000 calls/month (around 333/day or 13.8/hr)
 init();
-setDailyTimer(refresh, 12, 30); // Run refresh daily at 12:30 PM GMT
+setDailyTimer(refresh, 10, 30); // Run refresh daily at 10:30 AM GMT
