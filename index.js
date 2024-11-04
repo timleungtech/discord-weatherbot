@@ -75,7 +75,9 @@ function unixToTime(unixTimestamp) {
 }
 
 async function getWeather() {
+  const currentTimeET = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
   const response = await fetch(`https://api.pirateweather.net/forecast/${process.env.API_KEY}/${process.env.LATITUDE},${process.env.LONGITUDE}?&units=us`);
+  console.log(currentTimeET, '- data requested');
   const data = await response.json();
   return data;
 }
@@ -87,11 +89,20 @@ async function init() {
   client.login(process.env.DISCORD_TOKEN); // Log in to Discord
 }
 
+async function refresh_loop() {
+  await client.once('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}`);
+
+    while (true) {
+      getWeather()
+      await new Promise(resolve => setTimeout(resolve, fetch_timer)); 
+    }
+  });
+}
+
 async function refresh() {
   try {
     const data = await getWeather()
-    const currentTimeET = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
-    console.log(currentTimeET, '- data requested');
 
     const channel = client.channels.cache.get(process.env.CHANNEL_ID); // Replace with discord channel ID
     if (!channel) {
@@ -142,6 +153,8 @@ client.on('messageCreate', async (msg) => {
   }
 });
 
+let fetch_timer = 3600000
 // pirateweather api 10000 calls/month (around 333/day or 13.8/hr)
 init();
 setDailyTimer(refresh, 10, 30); // Run refresh daily at 10:30 AM GMT
+refresh_loop() // keepAlive
