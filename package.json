@@ -1,0 +1,22 @@
+{
+  "name": "discord-weatherbot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "timleungtech",
+  "license": "ISC",
+  "description": "Discord weather bot",
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.1.7"
+  },
+  "type": "module"
+}
