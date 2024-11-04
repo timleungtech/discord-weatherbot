@@ -75,7 +75,7 @@ function unixToHours(unixTimestamp) {
 }
 
 async function getWeather() {
-  const response = await fetch(`https://api.pirateweather.net/forecast/${process.env.API_KEY}/${latitude},${longitude}?&units=us`);
+  const response = await fetch(`https://api.pirateweather.net/forecast/${process.env.API_KEY}/${process.env.LATITUDE},${process.env.LONGITUDE}?&units=us`);
   const data = await response.json();
   return data;
 }
@@ -153,8 +153,5 @@ client.on('messageCreate', async (msg) => {
 });
 
 // pirateweather api 10000 calls/month (around 333/day or 13.8/hr)
-const latitude = process.env.latitude
-const longitude = process.env.longitude
-
 init();
 setDailyTimer(refresh, 7, 30); // Run refresh daily at 7:30 AM
