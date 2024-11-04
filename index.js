@@ -153,7 +153,7 @@ client.on('messageCreate', async (msg) => {
   }
 });
 
-let fetch_timer = 3600000
+let fetch_timer = 1800000
 // pirateweather api 10000 calls/month (around 333/day or 13.8/hr)
 init();
 setDailyTimer(refresh, 10, 30); // Run refresh daily at 10:30 AM GMT
