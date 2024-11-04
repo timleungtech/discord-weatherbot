@@ -94,7 +94,7 @@ async function refresh_loop() {
     console.log(`Logged in as ${client.user.tag}`);
 
     while (true) {
-      getWeather()
+      await getWeather()
       await new Promise(resolve => setTimeout(resolve, fetch_timer)); 
     }
   });
