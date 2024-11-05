@@ -62,11 +62,14 @@ function unixToTime(unixTimestamp) {
     timeZone: 'America/New_York',
     weekday: 'short',
     hour: '2-digit',
+    minute: '2-digit',
     hour12: false
   };
 
   // Convert date to localized string
-  const formattedDate = date.toLocaleString('en-US', options);
+  const formattedDate = date.toLocaleString('en-US', options)
+    .toUpperCase()               // Uppercase weekday
+    .replace(',', '');           // Remove comma
 
   return formattedDate;
 }
