@@ -55,23 +55,20 @@ function unixToDate(unixTimestamp) {
 
 function unixToTime(unixTimestamp) {
   // Create a Date object from the timestamp in milliseconds
-  const date = new Date(unixTimestamp * 1000); 
+  const date = new Date(unixTimestamp * 1000);
 
-  // Get the day of the week (0 for Sunday, 1 for Monday, etc.)
-  const dayOfWeek = date.getDay();
+  // Format the date to New York time (Eastern Time) with day and hour
+  const options = {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    hour: '2-digit',
+    hour12: false
+  };
 
-  // Array of weekday names
-  const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  // Convert date to localized string
+  const formattedDate = date.toLocaleString('en-US', options);
 
-  // Get the weekday name
-  const weekdayName = weekdays[dayOfWeek];
-
-  // Extract date and time components
-  let hours = date.getHours();
-  if (hours < 10) hours = '0' + hours
-
-  // Return a formatted string (customize as needed)
-  return `${weekdayName} ${hours}:00`;
+  return formattedDate;
 }
 
 async function getWeather() {
@@ -153,7 +150,7 @@ client.on('messageCreate', async (msg) => {
   }
 });
 
-let fetch_timer = 1800000
+let fetch_timer = 300000
 // pirateweather api 10000 calls/month (around 333/day or 13.8/hr)
 init();
 setDailyTimer(refresh, 10, 30); // Run refresh daily at 10:30 AM GMT
